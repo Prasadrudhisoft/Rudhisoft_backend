@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Contact Message - RUDHISOFT Admin Panel</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* =========================================================
+           CSS CUSTOM PROPERTIES
+        ========================================================= */
+        :root {
+            --primary: #2e3192;
+            --primary-dark: #1a1d5a;
+            --primary-gradient: linear-gradient(135deg, #2e3192 0%, #1a1d5a 100%);
+            --accent: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --gold: #fbbf24;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            /* Notification dropdown — overridden per breakpoint */
+            --notif-dropdown-width: 400px;
+            --notif-list-max-height: 380px;
+        }
+
+        /* =========================================================
+           RESET & BASE
+        ========================================================= */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-size: 16px; }
+        body { font-family: var(--font-primary); background: var(--gray-50); color: var(--gray-700); overflow-x: hidden; }
+
+        /* =========================================================
+           SIDEBAR
+        ========================================================= */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh; width: 280px;
+            background: var(--primary-gradient);
+            z-index: 1000;
+            box-shadow: var(--shadow-xl);
+            overflow-y: auto;
+            transition: transform var(--transition-base);
+        }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: var(--radius-full); }
+        .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+        .logo {
+            color: var(--white);
+            padding: 30px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; gap: 15px;
+            position: relative;
+        }
+        .logo-icon {
+            width: 50px; height: 50px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; overflow: hidden; padding: 8px;
+        }
+        .logo-img { width: 100%; height: 100%; object-fit: contain; }
+        .logo-text { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: var(--white); }
+
+        .sidebar-menu { list-style: none; padding: 20px 15px; margin: 0; }
+        .sidebar-menu li { margin: 8px 0; }
+        .sidebar-menu a {
+            display: flex; align-items: center;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            transition: all var(--transition-base);
+            font-weight: 500; font-size: 0.95rem;
+            position: relative;
+        }
+        .sidebar-menu a::before {
+            content: '';
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 4px; height: 0;
+            background: var(--gold);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            transition: height var(--transition-base);
+        }
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active { background: rgba(255,255,255,0.15); color: var(--white); transform: translateX(5px); }
+        .sidebar-menu a:hover::before,
+        .sidebar-menu a.active::before { height: 100%; }
+        .sidebar-menu a i { margin-right: 15px; width: 24px; font-size: 1.1rem; text-align: center; flex-shrink: 0; }
+
+        .sidebar-notif-badge {
+            margin-left: auto;
+            min-width: 22px; height: 22px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: var(--white);
+            border-radius: var(--radius-full);
+            font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 2px 6px rgba(239,68,68,0.3);
+        }
+        .sidebar-notif-badge.hidden { display: none !important; }
+
+        /* Sidebar mobile controls */
+        .sidebar-toggle {
+            display: none;
+            position: fixed; top: 15px; left: 15px; z-index: 1100;
+            width: 44px; height: 44px;
+            background: var(--primary-gradient);
+            border: none; border-radius: var(--radius-md);
+            color: var(--white); cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-base);
+            align-items: center; justify-content: center;
+            font-size: 1.2rem;
+        }
+        .sidebar-toggle:hover { transform: scale(1.05); }
+        .sidebar-toggle:active { transform: scale(0.95); }
+
+        .sidebar-close {
+            display: none;
+            position: absolute; top: 20px; right: 20px;
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.1);
+            border: none; border-radius: var(--radius-md);
+            color: var(--white); cursor: pointer;
+            align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            transition: all var(--transition-base);
+            z-index: 10;
+        }
+        .sidebar-close:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0; visibility: hidden;
+            transition: all var(--transition-base);
+        }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+        /* =========================================================
+           MAIN CONTENT
+        ========================================================= */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            background: var(--gray-50);
+            transition: margin-left var(--transition-base);
+        }
+
+        /* =========================================================
+           TOP NAVBAR
+        ========================================================= */
+        .top-navbar {
+            background: var(--white);
+            padding: 20px 35px;
+            box-shadow: var(--shadow-md);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .top-navbar h4 { margin: 0; color: var(--gray-900); font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; }
+        .admin-info { display: flex; align-items: center; gap: 20px; }
+        .admin-profile { display: flex; align-items: center; gap: 8px; }
+        .admin-avatar {
+            width: 40px; height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--white); font-weight: 700;
+            font-family: var(--font-display);
+            flex-shrink: 0;
+        }
+        .admin-name { color: var(--gray-600); font-weight: 500; }
+        .btn-logout {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: var(--white); border: none;
+            padding: 10px 24px; border-radius: var(--radius-full);
+            cursor: pointer; transition: all var(--transition-base);
+            font-weight: 600; box-shadow: var(--shadow-md);
+            font-family: var(--font-primary);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-logout:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+        /* =========================================================
+           NOTIFICATION BELL
+        ========================================================= */
+        .notification-wrapper { position: relative; }
+
+        .notification-bell {
+            position: relative; cursor: pointer;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--gray-50); border: 2px solid var(--gray-200);
+            display: flex; align-items: center; justify-content: center;
+            transition: all var(--transition-base);
+            color: var(--gray-600); font-size: 1.15rem; flex-shrink: 0;
+        }
+        .notification-bell:hover { background: var(--gray-100); border-color: var(--primary); color: var(--primary); transform: scale(1.05); }
+
+        .notification-badge {
+            position: absolute; top: -4px; right: -4px;
+            min-width: 22px; height: 22px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: var(--white); border-radius: var(--radius-full);
+            font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 5px; border: 2px solid var(--white);
+            box-shadow: 0 2px 8px rgba(239,68,68,0.4);
+            animation: badgePulse 2s infinite;
+            font-family: var(--font-display);
+        }
+        .notification-badge.hidden { display: none !important; }
+
+        @keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes bellShake {
+            0%   { transform: rotate(0); }   15% { transform: rotate(14deg); }
+            30%  { transform: rotate(-14deg); } 45% { transform: rotate(10deg); }
+            60%  { transform: rotate(-8deg); }  75% { transform: rotate(4deg); }
+            100% { transform: rotate(0); }
+        }
+        .bell-shake .fa-bell { animation: bellShake 0.8s ease-in-out; }
+
+        /* =========================================================
+           NOTIFICATION DROPDOWN — position: fixed (never clips viewport)
+        ========================================================= */
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .notification-dropdown {
+            position: fixed;
+            top: auto; right: 20px;
+            width: var(--notif-dropdown-width);
+            max-width: calc(100vw - 40px);
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid var(--gray-100);
+            z-index: 1050;
+            display: none; overflow: hidden;
+            animation: dropdownSlide 0.25s ease-out;
+        }
+        .notification-dropdown.show { display: block; }
+
+        .notification-dropdown-header {
+            background: var(--primary-gradient);
+            color: var(--white); padding: 18px 20px;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+        }
+        .notification-dropdown-header h6 {
+            margin: 0; font-family: var(--font-display);
+            font-size: 1rem; font-weight: 700;
+            display: flex; align-items: center; gap: 8px; white-space: nowrap;
+        }
+        .mark-all-read-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+            color: var(--white); padding: 6px 14px; border-radius: var(--radius-full);
+            font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            transition: all var(--transition-base);
+            font-family: var(--font-primary); white-space: nowrap; flex-shrink: 0;
+        }
+        .mark-all-read-btn:hover { background: rgba(255,255,255,0.3); }
+
+        .notification-list { max-height: var(--notif-list-max-height); overflow-y: auto; }
+        .notification-list::-webkit-scrollbar { width: 5px; }
+        .notification-list::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: var(--radius-full); }
+
+        .notification-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 16px 20px; border-bottom: 1px solid var(--gray-100);
+            transition: all var(--transition-base);
+            cursor: pointer; text-decoration: none; color: inherit; position: relative;
+        }
+        .notification-item:hover { background: var(--gray-50); }
+        .notification-item.unread { background: rgba(46,49,146,0.04); border-left: 3px solid var(--primary); }
+        .notif-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.95rem; color: var(--white); }
+        .notif-details { flex: 1; min-width: 0; }
+        .notif-title    { font-weight: 600; font-size: 0.9rem; color: var(--gray-900); margin-bottom: 3px; line-height: 1.3; }
+        .notif-subtitle { font-size: 0.8rem; color: var(--gray-500); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .notif-time     { font-size: 0.72rem; color: var(--gray-400); display: flex; align-items: center; gap: 4px; }
+        .unread-dot     { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+
+        .notification-empty { padding: 50px 20px; text-align: center; color: var(--gray-400); }
+        .notification-empty i { font-size: 2.5rem; margin-bottom: 12px; display: block; color: var(--gray-300); }
+        .notification-empty p { margin: 0; font-size: 0.95rem; font-weight: 500; }
+
+        .notification-dropdown-footer {
+            padding: 14px 20px; text-align: center;
+            border-top: 1px solid var(--gray-100); background: var(--gray-50);
+            display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px;
+        }
+        .notification-dropdown-footer a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color var(--transition-base); white-space: nowrap; }
+        .notification-dropdown-footer a:hover { color: var(--primary-dark); }
+        .notif-footer-sep { color: var(--gray-300); margin: 0 4px; }
+
+        /* =========================================================
+           CONTENT AREA
+        ========================================================= */
+        .content-area { padding: 35px; }
+
+        .loading-container { text-align: center; padding: 80px 20px; }
+        .loading-spinner {
+            display: inline-block; width: 50px; height: 50px;
+            border: 5px solid var(--gray-200); border-top-color: var(--primary);
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 20px; color: var(--gray-500); font-size: 1rem; }
+
+        .message-wrapper { max-width: 900px; margin: 0 auto; }
+
+        .message-container {
+            background: var(--white); border-radius: var(--radius-xl);
+            padding: 40px; box-shadow: var(--shadow-md); border: 1px solid var(--gray-100);
+        }
+        .message-container h5 {
+            color: var(--gray-900); font-family: var(--font-display);
+            font-size: 1.4rem; font-weight: 700;
+            margin-bottom: 30px; padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary);
+            position: relative; display: flex; align-items: center; gap: 12px;
+        }
+        .message-container h5::after {
+            content: ''; position: absolute; bottom: -3px; left: 0;
+            width: 60px; height: 3px; background: var(--gold);
+        }
+
+        .contact-info-box {
+            background: var(--gray-50); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg); padding: 25px; margin-bottom: 30px;
+        }
+        .info-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px; }
+        .info-row:last-child { margin-bottom: 0; }
+        .info-label { font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+        .info-value { font-size: 1rem; color: var(--gray-900); font-weight: 600; margin: 0; }
+        .info-value a { color: var(--primary); text-decoration: none; transition: color var(--transition-base); }
+        .info-value a:hover { color: var(--primary-dark); text-decoration: underline; }
+
+        .message-section { margin-bottom: 30px; }
+        .message-box { background: var(--white); border: 2px solid var(--gray-200); border-radius: var(--radius-md); padding: 25px; margin-top: 10px; }
+        .message-text { color: var(--gray-700); line-height: 1.8; white-space: pre-wrap; margin: 0; font-size: 1rem; }
+
+        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 25px; border-top: 1px solid var(--gray-200); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 14px 28px; border: none; border-radius: var(--radius-full);
+            font-family: var(--font-primary); font-weight: 600; font-size: 1rem;
+            cursor: pointer; transition: all var(--transition-base); text-decoration: none;
+        }
+        .btn-success   { background: linear-gradient(135deg, #10b981, #059669); color: var(--white); box-shadow: var(--shadow-md); }
+        .btn-success:hover   { transform: translateY(-2px); box-shadow: var(--shadow-lg); color: var(--white); }
+        .btn-danger    { background: linear-gradient(135deg, #ef4444, #dc2626); color: var(--white); box-shadow: var(--shadow-md); }
+        .btn-danger:hover    { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .btn-secondary { background: var(--gray-200); color: var(--gray-700); box-shadow: var(--shadow-md); }
+        .btn-secondary:hover { background: var(--gray-300); transform: translateY(-2px); color: var(--gray-700); }
+
+        /* =========================================================
+           RESPONSIVE BREAKPOINTS
+        ========================================================= */
+        @media (max-width: 1399px) {
+            .content-area { padding: 32px; }
+            .message-container { padding: 38px; }
+        }
+        @media (max-width: 1199px) {
+            .sidebar { width: 260px; } .main-content { margin-left: 260px; }
+            .logo { padding: 26px 22px; } .logo-icon { width: 46px; height: 46px; } .logo-text { font-size: 1.3rem; }
+            .top-navbar { padding: 18px 30px; } .top-navbar h4 { font-size: 1.4rem; }
+            .content-area { padding: 30px; } .message-container { padding: 35px; }
+            :root { --notif-dropdown-width: 360px; }
+        }
+        @media (max-width: 1023px) {
+            .sidebar { width: 240px; } .main-content { margin-left: 240px; }
+            .logo { padding: 24px 20px; } .logo-icon { width: 44px; height: 44px; } .logo-text { font-size: 1.25rem; }
+            .sidebar-menu { padding: 18px 12px; } .sidebar-menu a { padding: 13px 18px; font-size: 0.92rem; } .sidebar-menu a i { font-size: 1.05rem; }
+            .content-area { padding: 28px; } .message-container { padding: 32px; }
+            :root { --notif-dropdown-width: 340px; }
+        }
+        @media (max-width: 991px) {
+            .content-area { padding: 26px; } .top-navbar { padding: 16px 26px; } .top-navbar h4 { font-size: 1.3rem; }
+            .message-container { padding: 30px; }
+        }
+        @media (max-width: 767px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            .sidebar-overlay { display: block; } .sidebar-close { display: flex; }
+            .main-content { margin-left: 0; } .sidebar-toggle { display: flex; }
+            body.sidebar-open .sidebar-toggle { opacity: 0; visibility: hidden; pointer-events: none; }
+            .top-navbar { padding: 15px 20px; padding-left: 70px; } .top-navbar h4 { font-size: 1.2rem; }
+            .admin-name { display: none; } .btn-logout { padding: 8px 16px; font-size: 0.85rem; } .btn-logout span { display: none; }
+            .content-area { padding: 20px; } .message-container { padding: 25px 20px; } .message-container h5 { font-size: 1.2rem; }
+            .info-row { grid-template-columns: 1fr; gap: 15px; }
+            .action-buttons { flex-direction: column; } .action-buttons .btn { width: 100%; }
+            :root { --notif-dropdown-width: calc(100vw - 24px); --notif-list-max-height: 320px; }
+            .notification-dropdown { right: 12px; border-radius: var(--radius-lg); }
+            .notification-dropdown-header { padding: 15px 16px; } .notification-dropdown-header h6 { font-size: 0.9rem; }
+            .mark-all-read-btn { padding: 5px 10px; font-size: 0.7rem; }
+            .notification-item { padding: 14px 16px; gap: 12px; }
+            .notif-icon { width: 38px; height: 38px; font-size: 0.88rem; }
+            .notif-title { font-size: 0.85rem; } .notif-subtitle { font-size: 0.75rem; } .notif-time { font-size: 0.7rem; }
+            .notification-dropdown-footer { padding: 12px 16px; font-size: 0.85rem; }
+        }
+        @media (max-width: 480px) {
+            html { font-size: 14px; }
+            .sidebar { width: 85%; max-width: 320px; } .logo { padding: 25px 20px; padding-right: 60px; }
+            .logo-icon { width: 45px; height: 45px; } .logo-text { font-size: 1.3rem; }
+            .sidebar-close { top: 18px; right: 15px; width: 38px; height: 38px; font-size: 1.2rem; }
+            .sidebar-menu { padding: 15px 12px; } .sidebar-menu a { padding: 12px 16px; font-size: 0.9rem; }
+            .sidebar-toggle { width: 42px; height: 42px; font-size: 1.1rem; }
+            .top-navbar { padding: 12px 15px; padding-left: 65px; } .top-navbar h4 { font-size: 1rem; }
+            .admin-avatar { width: 36px; height: 36px; font-size: 0.9rem; } .btn-logout { padding: 6px 12px; }
+            .content-area { padding: 15px; } .message-container { padding: 20px 15px; }
+            .contact-info-box { padding: 20px; } .message-box { padding: 20px; } .btn { padding: 12px 24px; font-size: 0.95rem; }
+            :root { --notif-dropdown-width: calc(100vw - 20px); --notif-list-max-height: 280px; }
+            .notification-dropdown { right: 10px; } .notification-item { gap: 10px; }
+            .notif-icon { width: 34px; height: 34px; font-size: 0.8rem; }
+            .notification-dropdown-footer { flex-direction: column; gap: 6px; padding: 12px; }
+            .notif-footer-sep { display: none; }
+        }
+        @media (max-width: 360px) {
+            .sidebar { width: 90%; } .logo { padding: 20px 15px; padding-right: 55px; }
+            .logo-icon { width: 40px; height: 40px; } .logo-text { font-size: 1.2rem; }
+            .sidebar-close { width: 36px; height: 36px; font-size: 1.1rem; }
+            .sidebar-menu a { padding: 11px 14px; font-size: 0.85rem; }
+            .sidebar-toggle { width: 40px; height: 40px; top: 12px; left: 12px; }
+            .top-navbar { padding: 10px 12px; padding-left: 60px; } .top-navbar h4 { font-size: 0.95rem; }
+            .message-container { padding: 18px 12px; }
+            :root { --notif-dropdown-width: calc(100vw - 16px); } .notification-dropdown { right: 8px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+        a:focus-visible, button:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar"><i class="fas fa-bars"></i></button>
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <nav class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="logo">
+            <div class="logo-icon">
+                <img src="/static/images/logo.png" alt="Rudhisoft Logo" class="logo-img">
+            </div>
+            <span class="logo-text">RUDHISOFT</span>
+            <button class="sidebar-close" id="sidebarClose" aria-label="Close Sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="/careers"><i class="fas fa-briefcase"></i> Job Postings</a></li>
+            <li>
+                <a href="/applications">
+                    <i class="fas fa-file-alt"></i> Job Applications
+                    <span class="sidebar-notif-badge hidden" id="sidebarAppBadge">0</span>
+                </a>
+            </li>
+            <li>
+                <a href="/contacts" class="active">
+                    <i class="fas fa-envelope"></i> Contacts
+                    <span class="sidebar-notif-badge hidden" id="sidebarContactBadge">0</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <div class="main-content">
+
+        <!-- TOP NAVBAR -->
+        <header class="top-navbar">
+            <h4>View Contact Message</h4>
+            <div class="admin-info">
+
+                <!-- NOTIFICATION BELL -->
+                <div class="notification-wrapper" id="notificationWrapper">
+                    <button
+                        class="notification-bell"
+                        id="notificationBell"
+                        aria-label="Notifications"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        onclick="NotificationSystem.toggle()"
+                    >
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge hidden" id="notificationBadge">0</span>
+                    </button>
+
+                    <div class="notification-dropdown" id="notificationDropdown" role="dialog" aria-label="Notifications panel">
+                        <div class="notification-dropdown-header">
+                            <h6><i class="fas fa-bell"></i> Notifications</h6>
+                            <button class="mark-all-read-btn" onclick="NotificationSystem.markAllRead()">
+                                <i class="fas fa-check-double"></i> Mark All Read
+                            </button>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <div class="notification-empty">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Loading...</p>
+                            </div>
+                        </div>
+                        <div class="notification-dropdown-footer">
+                            <a href="/applications">View All Applications</a>
+                            <span class="notif-footer-sep">|</span>
+                            <a href="/contacts">View All Contacts</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADMIN PROFILE -->
+                <div class="admin-profile">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <span class="admin-name" id="adminUsername">Admin</span>
+                </div>
+
+                <!-- LOGOUT -->
+                <button class="btn-logout" onclick="Auth.logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <main class="content-area">
+
+            <!-- Loading -->
+            <div id="loading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading message details...</p>
+            </div>
+
+            <!-- Message content (hidden until loaded) -->
+            <div class="message-wrapper" id="contentContainer" style="display:none;">
+                <div class="message-container">
+                    <h5>
+                        <i class="fas fa-envelope-open"></i>
+                        Contact Message Details
+                    </h5>
+
+                    <!-- Contact Info -->
+                    <div class="contact-info-box">
+                        <div class="info-row">
+                            <div class="info-item">
+                                <div class="info-label">Sender Name</div>
+                                <p class="info-value" id="contactName">—</p>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Email Address</div>
+                                <p class="info-value" id="contactEmail">—</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="info-label">Date Received</div>
+                            <p class="info-value" id="contactDate">—</p>
+                        </div>
+                    </div>
+
+                    <!-- Message Content -->
+                    <div class="message-section">
+                        <div class="info-label">Message</div>
+                        <div class="message-box">
+                            <p class="message-text" id="contactMessage">—</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="#" id="replyBtn" class="btn btn-success">
+                            <i class="fas fa-reply"></i> Reply via Email
+                        </a>
+                        <button class="btn btn-danger" id="deleteBtn">
+                            <i class="fas fa-trash"></i> Delete Message
+                        </button>
+                        <a href="/contacts" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- =========================================================
+         JAVASCRIPT — organised into clear modules
+    ========================================================= -->
+    <script>
+    /* =========================================================
+       MODULE: Sidebar
+    ========================================================= */
+    const Sidebar = (() => {
+        const sidebar   = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const closeBtn  = document.getElementById('sidebarClose');
+        const overlay   = document.getElementById('sidebarOverlay');
+
+        function open() {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('sidebar-open');
+        }
+
+        function close() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+            document.body.classList.remove('sidebar-open');
+        }
+
+        function init() {
+            toggleBtn?.addEventListener('click', open);
+            closeBtn?.addEventListener('click', close);
+            overlay?.addEventListener('click', close);
+
+            sidebar.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 767) setTimeout(close, 200);
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 767) close();
+            });
+        }
+
+        return { init };
+    })();
+
+    /* =========================================================
+       MODULE: NotificationSystem
+    ========================================================= */
+    const NotificationSystem = (() => {
+        let previousCount   = 0;
+        let pollingInterval = null;
+
+        const bellBtn   = document.getElementById('notificationBell');
+        const dropdown  = document.getElementById('notificationDropdown');
+        const listEl    = document.getElementById('notificationList');
+        const topBadge  = document.getElementById('notificationBadge');
+        const appBadge  = document.getElementById('sidebarAppBadge');
+        const contBadge = document.getElementById('sidebarContactBadge');
+
+        /* ---- helpers ---- */
+
+        function positionDropdown() {
+            const rect   = bellBtn.getBoundingClientRect();
+            const top    = rect.bottom + 12;
+            const maxTop = window.innerHeight - 80;
+            dropdown.style.top = Math.min(top, maxTop) + 'px';
+        }
+
+        function setBadge(el, count) {
+            if (!el) return;
+            if (count > 0) { el.textContent = count > 99 ? '99+' : count; el.classList.remove('hidden'); }
+            else { el.classList.add('hidden'); }
+        }
+
+        function shakeBell() {
+            bellBtn?.classList.add('bell-shake');
+            setTimeout(() => bellBtn?.classList.remove('bell-shake'), 1000);
+        }
+
+        function timeAgo(dateString) {
+            if (!dateString) return 'Just now';
+            const s = Math.floor((Date.now() - new Date(dateString)) / 1000);
+            if (s < 60)     return 'Just now';
+            if (s < 3600)   return Math.floor(s / 60) + 'm ago';
+            if (s < 86400)  return Math.floor(s / 3600) + 'h ago';
+            if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        function renderEmpty(icon, text, color) {
+            return `<div class="notification-empty">
+                        <i class="fas ${icon}" style="color:${color};"></i>
+                        <p>${text}</p>
+                    </div>`;
+        }
+
+        /* ---- public API ---- */
+
+        async function fetchCount() {
+            try {
+                const res    = await fetch('/api/notifications/count');
+                const result = await res.json();
+                if (!result.success) return;
+                const { total_unread, unread_applications, unread_contacts } = result.data;
+                setBadge(topBadge,  total_unread);
+                setBadge(appBadge,  unread_applications);
+                setBadge(contBadge, unread_contacts);
+                if (total_unread > previousCount && previousCount !== 0) shakeBell();
+                previousCount = total_unread;
+                bellBtn?.setAttribute('aria-expanded', dropdown.classList.contains('show'));
+            } catch (err) { console.error('[Notifications] fetchCount error:', err); }
+        }
+
+        async function fetchList() {
+            listEl.innerHTML = renderEmpty('fa-spinner fa-spin', 'Loading…', '#9ca3af');
+            try {
+                const res    = await fetch('/api/notifications/latest');
+                const result = await res.json();
+                if (result.success && result.data.length > 0) {
+                    listEl.innerHTML = result.data.map(n => `
+                        <a href="javascript:void(0)" class="notification-item unread"
+                           onclick="NotificationSystem.markRead(event,'${n.type}',${n.id},'${n.url}')">
+                            <div class="notif-icon" style="background:${n.color};">
+                                <i class="fas ${n.icon}"></i>
+                            </div>
+                            <div class="notif-details">
+                                <div class="notif-title">${n.title}</div>
+                                <div class="notif-subtitle">${n.subtitle}</div>
+                                <div class="notif-time"><i class="fas fa-clock"></i> ${timeAgo(n.created_at)}</div>
+                            </div>
+                            <div class="unread-dot"></div>
+                        </a>`).join('');
+                } else {
+                    listEl.innerHTML = renderEmpty('fa-check-circle', 'All caught up! No new notifications.', '#10b981');
+                }
+            } catch (err) {
+                listEl.innerHTML = renderEmpty('fa-exclamation-circle', 'Error loading notifications', '#ef4444');
+            }
+        }
+
+        async function markRead(event, type, id, url) {
+            event.preventDefault();
+            try {
+                await fetch('/api/notifications/mark-read', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, id })
+                });
+                await fetchCount();
+            } catch (_) {}
+            window.location.href = url;
+        }
+
+        async function markAllRead() {
+            try {
+                const res    = await fetch('/api/notifications/mark-all-read', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                const result = await res.json();
+                if (result.success) {
+                    setBadge(topBadge, 0); setBadge(appBadge, 0); setBadge(contBadge, 0);
+                    previousCount = 0;
+                    listEl.innerHTML = renderEmpty('fa-check-circle', 'All caught up! No new notifications.', '#10b981');
+                }
+            } catch (err) { console.error('[Notifications] markAllRead error:', err); }
+        }
+
+        function toggle() {
+            if (!dropdown.classList.contains('show')) {
+                positionDropdown();
+                dropdown.classList.add('show');
+                bellBtn?.setAttribute('aria-expanded', 'true');
+                fetchList();
+            } else { close(); }
+        }
+
+        function close() {
+            dropdown.classList.remove('show');
+            bellBtn?.setAttribute('aria-expanded', 'false');
+        }
+
+        function startPolling() {
+            fetchCount();
+            pollingInterval = setInterval(fetchCount, 15000);
+        }
+
+        function stopPolling() { if (pollingInterval) clearInterval(pollingInterval); }
+
+        function init() {
+            document.addEventListener('click', (e) => {
+                const wrapper = document.getElementById('notificationWrapper');
+                if (wrapper && !wrapper.contains(e.target)) close();
+            });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+            window.addEventListener('resize', () => { if (dropdown.classList.contains('show')) positionDropdown(); });
+            window.addEventListener('scroll', () => { if (dropdown.classList.contains('show')) positionDropdown(); }, { passive: true });
+            window.addEventListener('beforeunload', stopPolling);
+        }
+
+        return { init, toggle, markRead, markAllRead, fetchCount, startPolling, stopPolling };
+    })();
+
+    /* =========================================================
+       MODULE: Auth
+    ========================================================= */
+    const Auth = (() => {
+        async function check() {
+            try {
+                const res  = await fetch('/api/check-auth');
+                const data = await res.json();
+                if (!data.logged_in) { window.location.href = '/'; return false; }
+                const name = data.username || 'Admin';
+                document.getElementById('adminUsername').textContent = name;
+                document.getElementById('adminAvatar').textContent   = name.charAt(0).toUpperCase();
+                return true;
+            } catch (err) { window.location.href = '/'; return false; }
+        }
+
+        async function logout() {
+            try { await fetch('/api/logout', { method: 'POST' }); } catch (_) {}
+            window.location.href = '/';
+        }
+
+        return { check, logout };
+    })();
+
+    /* =========================================================
+       MODULE: UI Helpers
+    ========================================================= */
+    const UI = (() => {
+        function showError(msg) {
+            document.getElementById('loading').innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:#ef4444;margin-bottom:16px;"></i>
+                <p class="loading-text" style="color:#dc2626;">${msg}</p>`;
+        }
+        return { showError };
+    })();
+
+    /* =========================================================
+       MODULE: ViewContact
+    ========================================================= */
+    const ViewContact = (() => {
+        const contactId = window.location.pathname.split('/').pop();
+
+        async function load() {
+            try {
+                const res    = await fetch(`/api/admin/contacts/${contactId}`);
+                const result = await res.json();
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (!result.success) {
+                    alert('Contact message not found.');
+                    setTimeout(() => { window.location.href = '/contacts'; }, 1000);
+                    return;
+                }
+
+                const c = result.data;
+
+                /* — Populate fields — */
+                document.getElementById('contactName').textContent    = c.name    || '—';
+                document.getElementById('contactEmail').innerHTML     = `<a href="mailto:${c.email}">${c.email}</a>`;
+                document.getElementById('contactDate').textContent    = c.created_at || 'N/A';
+                document.getElementById('contactMessage').textContent = c.message || 'No message provided.';
+
+                /* — Reply mailto — */
+                document.getElementById('replyBtn').href =
+                    `mailto:${c.email}?subject=Re: Your inquiry&body=Hi ${c.name},%0D%0A%0D%0AThank you for contacting RUDHISOFT.%0D%0A%0D%0A`;
+
+                /* — Delete button — */
+                document.getElementById('deleteBtn').addEventListener('click', () => deleteContact(c.id));
+
+                /* — Show content — */
+                document.getElementById('contentContainer').style.display = 'block';
+
+                /* — Refresh badges (viewing auto-marks as read server-side) — */
+                NotificationSystem.fetchCount();
+
+            } catch (err) {
+                UI.showError('Error loading message. Please try again.');
+            }
+        }
+
+        async function deleteContact(id) {
+            if (!confirm('Are you sure you want to delete this message? This action cannot be undone.')) return;
+            try {
+                const res    = await fetch(`/api/admin/contacts/${id}`, { method: 'DELETE' });
+                const result = await res.json();
+                if (result.success) {
+                    alert(result.message || 'Message deleted successfully!');
+                    window.location.href = '/contacts';
+                } else {
+                    alert(result.message || 'Error deleting message.');
+                }
+            } catch (err) {
+                alert('Error deleting message. Please try again.');
+            }
+        }
+
+        return { load };
+    })();
+
+    /* =========================================================
+       BOOT
+    ========================================================= */
+    (async function boot() {
+        Sidebar.init();
+        NotificationSystem.init();
+
+        const loggedIn = await Auth.check();
+        if (!loggedIn) return;
+
+        NotificationSystem.startPolling();
+        ViewContact.load();
+    })();
+    </script>
+</body>
+</html>
