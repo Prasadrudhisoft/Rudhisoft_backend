@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 import uuid
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://rudhisoft.com", "https://www.rudhisoft.com"])
 app.secret_key = 'your_super_secret_key_change_this'
 
 # ======================
@@ -894,4 +894,4 @@ def mark_all_notifications_read():
 # ======================
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)

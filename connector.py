@@ -1,11 +1,15 @@
 import pymysql
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Database Configuration
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'Atul@2002', 
-    'database': 'company_db',
+    'host': os.environ.get("HOST"),
+    'user': os.environ.get("USER"),
+    'password': os.environ.get("PASSWORD"), 
+    'database': os.environ.get("DATABASE"),
     'cursorclass': pymysql.cursors.DictCursor
 }
 
