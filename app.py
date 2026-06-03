@@ -9,6 +9,12 @@ from werkzeug.utils import secure_filename
 import uuid
 
 app = Flask(__name__)
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=True,      # HTTPS असल्यास
+    SESSION_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=3600
+)
 CORS(app, origins=["https://rudhisoft.com", "https://www.rudhisoft.com"])
 app.secret_key = 'your_super_secret_key_change_this'
 
@@ -48,40 +54,47 @@ def is_logged_in():
 # ======================
 # PAGE ROUTES (Serve HTML Files)
 # ======================
-
 @app.route('/')
 def login_page():
     return render_template("login.html")
 
 @app.route('/dashboard')
+@login_required
 def dashboard_page():
     return render_template("dashboard.html")
 
 @app.route('/careers')
+@login_required
 def careers_page():
     return render_template("careers.html")
 
 @app.route('/careers/add')
+@login_required
 def career_add_page():
     return render_template("career_add.html")
 
 @app.route('/careers/edit/<int:id>')
+@login_required
 def career_edit_page(id):
     return render_template("career_edit.html")
 
 @app.route('/contacts')
+@login_required
 def contacts_page():
     return render_template("contacts.html")
 
 @app.route('/contacts/view/<int:id>')
+@login_required
 def contact_view_page(id):
     return render_template("contact_view.html")
 
 @app.route('/applications')
+@login_required
 def applications_page():
     return render_template("applications.html")
 
 @app.route('/applications/view/<int:id>')
+@login_required
 def application_view_page(id):
     return render_template("application_view.html")
 
